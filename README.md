@@ -27,6 +27,11 @@ https://www.usatoday.com/picture-gallery/life/2020/09/06/the-worlds-most-importa
 https://www.behindthename.com/names/
 
 Data Engineering Track:
+
+Data engineering is a critical aspect of any data-driven organization, where data scientists and analysts work with large amounts of data to extract insights and make data-driven decisions. In recent years, Streamlit has become a popular framework for building interactive data applications, making it easier for data engineers to create and share data-driven applications with their team members.  For the data engineering in this project, Team 3 will be using Streamlit to showcase the data.
+
+Team 3 choose the Streamlit library for different reasons, the intuitive, interactive customizable API, real time updates, forward support growth with machine learning as well as the ease of coding.  Using simple maintainable code base that does not require complex coding techniques.
+
 **Objective**: Follow data engineering processes. **Requirements**:
 Tasks:
 Main Repo/Readme/Proposal/Project Lead:  Jeremiah C Mergenthaler
