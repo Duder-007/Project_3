@@ -21,3 +21,6 @@ with st.sidebar:
     
     state_list = list(df_top_baby_names_yr.State.unique())
     selected_state = st.selectbox("Select a state", state_list)
+
+    # df_selected_state = [df_top_baby_names_yr == selected_state]
+    # df_selected_state_sorted = df_selected_state.sort_values(by="Count")
