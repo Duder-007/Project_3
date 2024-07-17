@@ -24,3 +24,6 @@ with st.sidebar:
 
     # df_selected_state = [df_top_baby_names_yr == selected_state]
     # df_selected_state_sorted = df_selected_state.sort_values(by="Count")
+
+    # df_selected_state = [df_top_baby_names_yr == selected_state]
+    # df_selected_state_sorted = df_selected_state.sort_values(by="Count")
