@@ -1,20 +1,29 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
 
-st.title('My first streamlit app')
-st.title('Second line to update')
+st.set_page_config(
+    page_title="US Baby Name Dashboard",
+    page_icon="👶",
+    layout="wide",
+    initial_sidebar_state="expanded")
 
-# import streamlit as st
-# import pandas as pd
-# import matplotlib as pyplt
-# import altair as alt
+alt.themes.enable("dark")
 
-# # initial set up
+# loading in data frames
 
-# st.set_page_config(
-#     page_title="US Baby Name Dashboard",
-#     page_icon="👶",
-#     layout="wide",
-#     initial_sidebar_state="expanded")
+df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/Top_baby_names_by_state.csv")
 
-# alt.themes.enable("dark")
+
+# creating side bar with year list
+with st.sidebar:
+    st.title("US Baby Names Dashboard")
+    
+    state_list = list(df_top_baby_names_yr.State.unique())
+    selected_state = st.selectbox("Select a state", state_list)
+
+    # df_selected_state = [df_top_baby_names_yr == selected_state]
+    # df_selected_state_sorted = df_selected_state.sort_values(by="Count")
+
+    # df_selected_state = [df_top_baby_names_yr == selected_state]
+    # df_selected_state_sorted = df_selected_state.sort_values(by="Count")
