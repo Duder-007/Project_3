@@ -25,18 +25,27 @@ with st.sidebar:
     df_selected_year = df_top_baby_names_yr[df_top_baby_names_yr.Year == selected_year]
     df_selected_year_sorted = df_selected_year.sort_values(by="Count", ascending=False)
 
-
+# func to iterate off of selected year
 def calculate_most_popular_names(selected_year):
+
     df_selected_year = df_top_baby_names_yr[df_top_baby_names_yr.Year == selected_year]
-    popular_five_male_name = df_selected_year[df_selected_year["Gender"] == "M"]["Name"].value_counts().idxmax()
-    popular_five_female_name = df_selected_year[df_selected_year["Gender"] == "F"]["Name"].value_counts().idxmax()
-    state_most_popular_male = df_selected_year[(df_selected_year["Name"] == popular_five_male_name) & (df_selected_year["Gender"] == "M")]["State"].value_counts().idxmax[0]
-    state_most_popular_female = df_selected_year[(df_selected_year["Name"] == popular_five_female_name) & (df_selected_year["Gender"] == "F")]["State"].value_counts().idxmax[0]
+    popular_male_name = df_selected_year[df_selected_year["Gender"] == "M"]["Name"].value_counts().idxmax()
+    popular_female_name = df_selected_year[df_selected_year["Gender"] == "F"]["Name"].value_counts().idxmax()
 
-    # print the results
+    # excess code, might be useful later:
+    # state_most_popular_male = df_selected_year[(df_selected_year["Name"] == popular_male_name) & (df_selected_year["Gender"] == "M")]["State"].value_counts().idxmax()
+    # state_most_popular_female = df_selected_year[(df_selected_year["Name"] == popular_female_name) & (df_selected_year["Gender"] == "F")]["State"].value_counts().idxmax()
+
+    df_popular_male = df_selected_year[(df_selected_year["Name"] == popular_male_name) & (df_selected_year["Gender"] == "M")]
+    df_popular_female = df_selected_year[(df_selected_year["Name"] == popular_female_name) & (df_selected_year["Gender"] == "F")]
+    most_pop_state_male = df_popular_male.groupby("State")["Count"].sum().idxmax()
+    most_pop_state_female = df_popular_female.groupby("State")["Count"].sum().idxmax()
+
+    # writing in print statements when func is called to update output
     with st.sidebar:
-        st.write(f"Most popular Male name in {selected_year} was {popular_five_male_name}, in {state_most_popular_male}")
-        st.write(f"Most popular Female name in {selected_year} was {popular_five_female_name}, in {state_most_popular_female}")
+        st.write(f"Most popular Male name in {selected_year} was {popular_male_name}, in {most_pop_state_male}")
+        st.write(f"Most popular Female name in {selected_year} was {popular_female_name}, in {most_pop_state_female}")
 
+# running func
 calculate_most_popular_names(selected_year)
 
