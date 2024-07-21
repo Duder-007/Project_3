@@ -21,6 +21,8 @@ with st.sidebar:
     
     year_list = list(df_top_baby_names_yr.Year.unique())
     selected_year = st.selectbox("Select a year", year_list)
+    st.write("")
+    st.write("")
 
     df_selected_year = df_top_baby_names_yr[df_top_baby_names_yr.Year == selected_year]
     df_selected_year_sorted = df_selected_year.sort_values(by="Count", ascending=False)
@@ -43,8 +45,21 @@ def calculate_most_popular_names(selected_year):
 
     # writing in print statements when func is called to update output
     with st.sidebar:
-        st.write(f"Most popular Male name in {selected_year} was {popular_male_name}, in {most_pop_state_male}")
-        st.write(f"Most popular Female name in {selected_year} was {popular_female_name}, in {most_pop_state_female}")
+        st.markdown(f"# Male Name")
+        st.markdown(f"## State: {most_pop_state_male}")
+        st.markdown(f"### {popular_male_name}")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.markdown(f"# Female Name")
+        st.markdown(f"## State: {most_pop_state_female}")
+        st.markdown(f"### {popular_female_name}")
+        
+
+        # st.write(f"Most popular Male name in {selected_year} was {popular_male_name}, in {most_pop_state_male}")
+        # st.write(f"Most popular Female name in {selected_year} was {popular_female_name}, in {most_pop_state_female}")
 
 # running func
 calculate_most_popular_names(selected_year)
