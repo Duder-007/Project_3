@@ -67,15 +67,20 @@ alt.themes.enable("dark")
 # Loading in data frames
 df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
 
-# Creating side bar with year list
+# Creating sidebar with year list and name filter
 with st.sidebar:
     st.title("US Baby Names Dashboard")
     
     year_list = list(df_top_baby_names_yr.Year.unique())
     selected_year = st.selectbox("Select a year", year_list)
+    
+    name_list = df_top_baby_names_yr.Name.unique().tolist()
+    selected_names = st.multiselect("Select names", name_list)
 
-# Filter the dataframe based on the selected year
+# Filter the dataframe based on the selected year and names
 df_filtered = df_top_baby_names_yr[df_top_baby_names_yr["Year"] == selected_year]
+if selected_names:
+    df_filtered = df_filtered[df_filtered["Name"].isin(selected_names)]
 
 # Function to create heatmap
 def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
@@ -121,9 +126,9 @@ def make_choropleth(df):
 st.title('Baby Names Heatmap and Choropleth Map')
 
 # Selection boxes for user inputs
-input_y = st.selectbox('Select Y axis', df_top_baby_names_yr.columns, index=df_top_baby_names_yr.columns.get_loc('Year'))
-input_x = st.selectbox('Select X axis', df_top_baby_names_yr.columns, index=df_top_baby_names_yr.columns.get_loc('State'))
-input_color = st.selectbox('Select Color axis', df_top_baby_names_yr.columns, index=df_top_baby_names_yr.columns.get_loc('Count'))
+input_y = st.selectbox('Select Y axis', df_filtered.columns, index=df_filtered.columns.get_loc('Year'))
+input_x = st.selectbox('Select X axis', df_filtered.columns, index=df_filtered.columns.get_loc('State'))
+input_color = st.selectbox('Select Color axis', df_filtered.columns, index=df_filtered.columns.get_loc('Count'))
 input_color_theme = st.selectbox('Select Color Theme', ['viridis', 'inferno', 'magma', 'plasma', 'blueorange', 'redblue'])
 
 # Generate and display heatmap
