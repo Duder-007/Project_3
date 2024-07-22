@@ -72,9 +72,18 @@ if selected_names:
     df_filtered = df_filtered[df_filtered["Name"].isin(selected_names)]
 
 # Calculating the percentage of biblical names, like figuring out how much of your herd is prize-winning.
-biblical_names = set(biblical_names_df["Name"].str.upper())
-selected_biblical_names = set(name.upper() for name in selected_names if name.upper() in biblical_names)
-percent_biblical = len(selected_biblical_names) / len(selected_names) * 100 if selected_names else 0
+# Calculate the percentage of biblical names in the selected year
+df_filtered = df_top_baby_names_yr[df_top_baby_names_yr['Year'] == selected_year]
+selected_biblical_names = set(df_filtered['Name']).intersection(set(biblical_names_df['Name']))
+percent_biblical = len(selected_biblical_names) / len(set(df_filtered['Name'])) * 100 if df_filtered['Name'].any() else 0
+
+st.write(f"Percentage of biblical names in the top baby names for {selected_year}: {percent_biblical:.2f}%")
+
+
+
+#biblical_names = set(biblical_names_df["Name"].str.upper())
+#selected_biblical_names = set(name.upper() for name in selected_names if name.upper() in biblical_names)
+#percent_biblical = len(selected_biblical_names) / len(selected_names) * 100 if selected_names else 0
 
 # Creating a donut chart, simple as pie.
 def make_donut_chart(percent):
