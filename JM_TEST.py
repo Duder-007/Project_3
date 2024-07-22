@@ -4,6 +4,14 @@ import altair as alt
 import folium
 from streamlit.components.v1 import html
 
+# Setting up the page layout
+st.set_page_config(
+    page_title="US Baby Name Dashboard",
+    page_icon="👶",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 # Custom CSS for slide-in sidebar
 custom_css = """
 <style>
@@ -53,14 +61,6 @@ toggleButton.addEventListener('click', () => {
 });
 </script>
 """, unsafe_allow_html=True)
-
-# Setting up the page layout
-st.set_page_config(
-    page_title="US Baby Name Dashboard",
-    page_icon="👶",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
 
 alt.themes.enable("dark")
 
