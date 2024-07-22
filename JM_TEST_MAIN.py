@@ -57,6 +57,7 @@ alt.themes.enable("dark")  # Set a dark theme for our charts, easy on the eyes l
 df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
 biblical_names_df = pd.read_csv("Baby_Names_Start/biblical_names.csv")
 df_top_five_names_per_state = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+AList_names_df = pd.read_csv("Baby_Names_Start/AList.csv")
 
 # Setting up the sidebar for selections, like choosing the right tool for the job.
 with st.sidebar:
@@ -77,14 +78,6 @@ df_filtered = df_top_baby_names_yr[df_top_baby_names_yr['Year'] == selected_year
 selected_biblical_names = set(df_filtered['Name']).intersection(set(biblical_names_df['Name']))
 percent_biblical = len(selected_biblical_names) / len(set(df_filtered['Name'])) * 100 if df_filtered['Name'].any() else 0
 
-#st.write(f"Percentage of biblical names in the top baby names for {selected_year}: {percent_biblical:.2f}%")
-
-
-
-#biblical_names = set(biblical_names_df["Name"].str.upper())
-#selected_biblical_names = set(name.upper() for name in selected_names if name.upper() in biblical_names)
-#percent_biblical = len(selected_biblical_names) / len(selected_names) * 100 if selected_names else 0
-
 # Creating a donut chart, simple as pie.
 def make_donut_chart(percent):
     data = pd.DataFrame({
@@ -99,6 +92,25 @@ def make_donut_chart(percent):
     return chart
 
 donut_chart = make_donut_chart(percent_biblical)
+
+# Calculating the percentage of Actor names, like figuring out how much of your herd is prize-winning.
+# Calculate the percentage of Actor names in the selected year
+df_filtered = df_top_baby_names_yr[df_top_baby_names_yr['Year'] == selected_year]
+selected_AList_names = set(df_filtered['Name']).intersection(set(AList_names_df['Name']))
+percent_biblical = len(selected_AList_names) / len(set(df_filtered['Name'])) * 100 if df_filtered['Name'].any() else 0
+
+# Creating a donut chart, simple as pie.
+def make_donut_chart2(percent):
+    data = pd.DataFrame({
+        'category': ['Actor Names', 'Other Names'],
+        'value': [percent, 100 - percent]
+    })
+    chart = alt.Chart(data).mark_arc(innerRadius=50).encode(
+        theta=alt.Theta(field="value", type="quantitative"),
+        color=alt.Color(field="category", type="nominal", scale=alt.Scale(range=["#4CAF50", "#FFCCCB"])),
+        tooltip=["category", "value"]
+    ).properties(width=200, height=200)
+    return chart
 
 # Drawing up the heatmap, like laying out a map for a new territory.
 def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
