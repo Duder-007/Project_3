@@ -151,7 +151,7 @@ with col1:
     input_y = st.selectbox('Select Y axis', df_filtered.columns, index=df_filtered.columns.get_loc('Year'))  # Choosing what goes on the Y-axis.
     input_x = st.selectbox('Select X axis', df_filtered.columns, index=df_filtered.columns.get_loc('State'))  # Choosing what goes on the X-axis.
     input_color = st.selectbox('Select Color axis', df_filtered.columns, index=df_filtered.columns.get_loc('Count'))  # Choosing the data for color coding.
-    input_color_theme = st.selectbox('Select Color Theme', ['viridis', 'inferno', 'magma', 'plasma', 'blueorange', 'redblue'])  # Picking a color scheme.
+    input_color_theme = st.selectbox('Color Theme', ["yellowgreen"])  # setting a color scheme to match.
 
     # Display the heatmap, bright as a new silver dollar.
     heatmap_chart = make_heatmap(df_filtered, input_y, input_x, input_color, input_color_theme)
@@ -181,7 +181,7 @@ with col2:
         names_chart = alt.Chart(top_names).mark_bar().encode(
             x='Name:N',
             y='Count:Q',
-            color=alt.Color('Count:Q', scale=alt.Scale(scheme='redblue')),
+            color=alt.Color('Count:Q', scale=alt.Scale(scheme='yellowgreen')),
             tooltip=['Name', 'Count']
         ).properties(height=300, width=400)
         st.altair_chart(names_chart, use_container_width=True)  # Display the bar chart.
