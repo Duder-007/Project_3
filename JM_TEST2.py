@@ -12,6 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed" # We're starting with the sidebar tucked away.
 )
 
+
 # This here’s the custom CSS to keep that sidebar behaving, hidden until called.
 custom_css = """
 <style>
