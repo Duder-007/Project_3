@@ -24,6 +24,7 @@ Research questions:
 7. Males and Females with the same name, years and the number of babies given any male/female name in that year.
     Jack working on it
 8. The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
+    Thierno working on it.
 Source:
 https://www.ssa.gov/oact/babynames/
 https://www.imdb.com/list/ls025653489/
