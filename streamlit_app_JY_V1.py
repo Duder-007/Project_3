@@ -1,68 +1,3 @@
-# import streamlit as st
-# import pandas as pd
-# import altair as alt
-
-# st.set_page_config(
-#     page_title="US Baby Name Dashboard",
-#     page_icon="👶",
-#     layout="wide",
-#     initial_sidebar_state="expanded")
-
-# alt.themes.enable("dark")
-
-# # loading in data frames
-
-# df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
-
-
-# # creating side bar with year list
-# with st.sidebar:
-#     st.title("US Baby Names Dashboard")
-    
-#     year_list = list(df_top_baby_names_yr.Year.unique())
-#     selected_year = st.selectbox("Select a year", year_list)
-#     st.write("")
-#     st.write("")
-
-#     df_selected_year = df_top_baby_names_yr[df_top_baby_names_yr.Year == selected_year]
-#     df_selected_year_sorted = df_selected_year.sort_values(by="Count", ascending=False)
-
-# # func to iterate off of selected year
-# def calculate_most_popular_names(selected_year):
-
-#     df_selected_year = df_top_baby_names_yr[df_top_baby_names_yr.Year == selected_year]
-#     popular_male_name = df_selected_year[df_selected_year["Gender"] == "M"]["Name"].value_counts().idxmax()
-#     popular_female_name = df_selected_year[df_selected_year["Gender"] == "F"]["Name"].value_counts().idxmax()
-
-#     # excess code, might be useful later:
-#     # state_most_popular_male = df_selected_year[(df_selected_year["Name"] == popular_male_name) & (df_selected_year["Gender"] == "M")]["State"].value_counts().idxmax()
-#     # state_most_popular_female = df_selected_year[(df_selected_year["Name"] == popular_female_name) & (df_selected_year["Gender"] == "F")]["State"].value_counts().idxmax()
-
-#     df_popular_male = df_selected_year[(df_selected_year["Name"] == popular_male_name) & (df_selected_year["Gender"] == "M")]
-#     df_popular_female = df_selected_year[(df_selected_year["Name"] == popular_female_name) & (df_selected_year["Gender"] == "F")]
-#     most_pop_state_male = df_popular_male.groupby("State")["Count"].sum().idxmax()
-#     most_pop_state_female = df_popular_female.groupby("State")["Count"].sum().idxmax()
-
-#     # writing in print statements when func is called to update output
-#     with st.sidebar:
-#         st.markdown(f"# Male Name")
-#         st.markdown(f"## State: {most_pop_state_male}")
-#         st.markdown(f"### {popular_male_name}")
-#         st.write("")
-#         st.write("")
-#         st.write("")
-#         st.write("")
-#         st.write("")
-#         st.markdown(f"# Female Name")
-#         st.markdown(f"## State: {most_pop_state_female}")
-#         st.markdown(f"### {popular_female_name}")
-        
-
-#         # st.write(f"Most popular Male name in {selected_year} was {popular_male_name}, in {most_pop_state_male}")
-#         # st.write(f"Most popular Female name in {selected_year} was {popular_female_name}, in {most_pop_state_female}")
-
-# # running func
-# calculate_most_popular_names(selected_year)
 
 import streamlit as st
 import pandas as pd
@@ -256,24 +191,45 @@ with col2:
 
 # deliverable 7
 
-# creating output underneath in column 2 for most popular names over the last century
+# creating output underneath for most popular names over the last century
+
+# writing in a title
+st.title("Most Popular Name Over Last Century")
+
+# reading csv file
+top_baby_names_100yrs_df = pd.read_csv("Baby_Names_Start/2top_baby_names.csv")
+
+# finding the most popular names over the df
+most_popular_male_name = top_baby_names_100yrs_df["Male Names"].value_counts().idxmax()
+most_popular_female_name = top_baby_names_100yrs_df["Female Names"].value_counts().idxmax()
+
+# formatting for output
+st.markdown(f"## Male Name")
+st.markdown(f"### {most_popular_male_name}")
+st.write("")
+st.write("")
+st.write("")
+st.markdown(f"## Female Name")
+st.markdown(f"### {most_popular_female_name}")
+
+# deliverable 9
+
 with col2:
-
-    # writing in a title
-    st.title("Most Popular Name Over Last Century")
-
-    # reading csv file
-    top_baby_names_100yrs_df = pd.read_csv("Baby_Names_Start/2top_baby_names.csv")
-
-    # finding the most popular names over the df
-    most_popular_male_name = top_baby_names_100yrs_df["Male Names"].value_counts().idxmax()
-    most_popular_female_name = top_baby_names_100yrs_df["Female Names"].value_counts().idxmax()
-
-    # formatting for output
-    st.markdown(f"## Male Name")
-    st.markdown(f"### {most_popular_male_name}")
-    st.write("")
-    st.write("")
-    st.write("")
-    st.markdown(f"## Female Name")
-    st.markdown(f"### {most_popular_female_name}")
+    # Top Baby Names by States
+    top_names_states = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+    # Group by State, Gender, and Name and sum the Counts
+    top_names_state_df = top_names_states.groupby(["State", "Gender", "Name"])["Count"].sum().reset_index()
+    # Grab the top 5 (each gender) from each state
+    top_names_state_df = top_names_state_df.sort_values("Count", ascending=False).groupby(["State", "Gender"]).head(5)
+    # Sorting by state name
+    top_names_state_df = top_names_state_df.sort_values("State")
+    # Streamlit Title
+    st.title("Top Baby Names by State")
+    # Display the DataFrame
+    st.write("Top baby names (top 5 for each gender) in each state:")
+    st.dataframe(top_names_state_df)
+    # Select a state to filter the data
+    state_filter = st.selectbox("Select a state to filter:", top_names_state_df["State"].unique())
+    filtered_df = top_names_state_df[top_names_state_df["State"] == state_filter]
+    st.write(f"Top baby names in {state_filter}:")
+    st.dataframe(filtered_df)
