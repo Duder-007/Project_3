@@ -9,15 +9,17 @@ Description:
 Baby names can have a curious origin so can we identify some trends that make people choose the names they do?  Over the past 100 years we will attempt to identify popular names and some trends that influence the outcome.
 Research questions:
 ## Deliverables
-1. Investigate names that have been given to babies of either sex every year for the 100 years from 1924 through 2024..
-2. Traditional names, faddish names.  Popularity according to the number of years that the name appears in the dataset, does it re-appear during certain times?  
-3. Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset.  
-4.  Movie/Actor names popular by decade.
-5.  Popular names surrounding world events.
-6.  Biblical names by state, vs. common names, how often do biblical names appear on average?
-7. What is the most popular name in 100 years, how often does it occur?  Yearly trends?
-8. Males and Females with the same name, years and the number of babies given any male/female name in that year.
-9. The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
+1. (Theirno) Investigate names that have been given to babies of either sex every year for the 100 years from 1924 through 2024..
+    Using dropdown from 1910-2024 find the names
+2. (JEN)Traditional names, faddish names.  Popularity according to the number of years that the name appears in the dataset, does it re-appear during certain times?  
+    Actor names, percentage found
+3. (Thierno)Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset. 
+4.  (JEN)Movie/Actor names popular by decade.
+5.  (Slyvia)Biblical names by state, vs. common names, how often do biblical names appear on average?
+6. (JACK) What is the most popular name in 100 years, how often does it occur?  Yearly trends?    
+7. (JACK) Males and Females with the same name, years and the number of babies given any male/female name in that year.
+8. (Sylvia)The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
+    
 Source:
 https://www.ssa.gov/oact/babynames/
 https://www.imdb.com/list/ls025653489/
@@ -25,8 +27,14 @@ https://en.wikipedia.org/wiki/List_of_actors_with_Hollywood_Walk_of_Fame_motion_
 https://news.gallup.com/poll/3427/most-important-events-century-from-viewpoint-people.aspx
 https://www.usatoday.com/picture-gallery/life/2020/09/06/the-worlds-most-important-event-every-year-since-1920/42346845/
 https://www.behindthename.com/names/
+https://rpubs.com/toldham2/babynames
 
 Data Engineering Track:
+
+Data engineering is a critical aspect of any data-driven organization, where data scientists and analysts work with large amounts of data to extract insights and make data-driven decisions. In recent years, Streamlit has become a popular framework for building interactive data applications, making it easier for data engineers to create and share data-driven applications with their team members.  For the data engineering in this project, Team 3 will be using Streamlit to showcase the data.
+
+Team 3 choose the Streamlit library for different reasons, the intuitive, interactive customizable API, real time updates, forward support growth with machine learning as well as the ease of coding.  Using simple maintainable code base that does not require complex coding techniques.
+
 **Objective**: Follow data engineering processes. **Requirements**:
 Tasks:
 Main Repo/Readme/Proposal/Project Lead:  Jeremiah C Mergenthaler
