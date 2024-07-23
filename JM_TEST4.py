@@ -235,3 +235,6 @@ yearly_trends_chart = alt.Chart(df_yearly_trends).mark_line(point=True).encode(
 )
 
 st.altair_chart(yearly_trends_chart, use_container_width=True)
+
+
+
