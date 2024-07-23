@@ -357,3 +357,174 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # Displaying the donut chart, cowboy.
+    st.altair_chart(donut_chart, use_container_width=True)
+
+    # Displaying the most popular names over the last century.
+    st.title("Most Popular Name Over Last Century")
+    most_popular_male_name = top_baby_names_100yrs_df["Male Names"].value_counts().idxmax()
+    most_popular_female_name = top_baby_names_100yrs_df["Female Names"].value_counts().idxmax()
+    st.markdown(f"## Male Name")
+    st.markdown(f"### {most_popular_male_name}")
+    st.write("")
+    st.markdown(f"## Female Name")
+    st.markdown(f"### {most_popular_female_name}")
+
+# Right column setup.
+with col2:
+    st.title("Top 5 Names per State")
+    df_top_five_filtered = df_top_five_names_per_state[df_top_five_names_per_state["Year"] == selected_year]
+    
+    state_list = df_top_five_filtered['State'].unique().tolist()
+    selected_state = st.selectbox("Select a state", state_list)
+    
+    if selected_state:
+        top_names = df_top_five_filtered[df_top_five_filtered['State'] == selected_state][['Name', 'Count']]
+        names_chart = alt.Chart(top_names).mark_bar().encode(
+            x='Name:N',
+            y='Count:Q',
+            color=alt.Color('Count:Q', scale=alt.Scale(scheme=input_color_theme)),
+            tooltip=['Name', 'Count']
+        ).properties(height=300, width=400)
+        st.altair_chart(names_chart, use_container_width=True)
+
+    # Displaying top baby names by state.
+    top_names_states = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+    top_names_state_df = top_names_states.groupby(["State", "Gender", "Name"])["Count"].sum().reset_index()
+    top_names_state_df = top_names_state_df.sort_values("Count", ascending=False).groupby(["State", "Gender"]).head(5)
+    top_names_state_df = top_names_state_df.sort_values("State")
+    st.title("Top Baby Names by State")
+    st.write("Top baby names (top 5 for each gender) in each state:")
+    st.dataframe(top_names_state_df)
+    state_filter = st.selectbox("Select a state to filter:", top_names_state_df["State"].unique())
+    filtered_df = top_names_state_df[top_names_state_df["State"] == state_filter]
+    st.write(f"Top baby names in {state_filter}:")
+    st.dataframe(filtered_df)
+
+# Displaying yearly trends for the selected top name.
+df_yearly_trends = df_top_baby_names_yr[df_top_baby_names_yr['Name'] == selected_top_name]
+total_occurrences = df_yearly_trends['Count'].sum()
+st.title(f'Yearly Trends for the Name {selected_top_name}')
+st.write(f"The name **{selected_top_name}** has a total of **{total_occurrences}** occurrences over the last 100 years.")
+yearly_trends_chart = alt.Chart(df_yearly_trends).mark_line(point=True).encode(
+    x='Year:O',
+    y='Count:Q',
+    tooltip=['Year', 'Count']
+).properties(
+    width=800,
+    height=400,
+    title=f"Yearly Trends of the Name {selected_top_name}"
+)
+st.altair_chart(yearly_trends_chart, use_container_width=True)
+
+# Finding and displaying unisex names.
+df = pd.read_csv("Baby_Names_Start/usa_baby_names.csv")
+def find_unisex_names(df):
+    male_names = df[df["sex"] == "M"]["first_name"].unique()
+    female_names = df[df["sex"] == "F"]["first_name"].unique()
+    unisex_names = list(set(male_names) & set(female_names))
+    return unisex_names
+
+unisex_names = find_unisex_names(df)
+
+def find_years_for_unisex_names(df, unisex_names):
+    years_for_unisex_names = {}
+    for name in unisex_names:
+        years = df[df["first_name"] == name]["year"].unique()
+        years_for_unisex_names[name] = ', '.join(map(str, years))
+    return years_for_unisex_names
+
+years_for_unisex_names = find_years_for_unisex_names(df, unisex_names)
+
+# Displaying unisex names and the years they appeared.
+markdown_text = '## Unisex Names and the Years They Appeared:\n'
+for name, years in years_for_unisex_names.items():
+    markdown_text += f'- **{name}**: {years}\n'
+st.markdown(markdown_text)
+
+# Load data function, pilgrim. Gotta get those CSV files read into DataFrames.
+def load_data():
+    baby_names_df = pd.read_csv('Baby_Names_Start/top_baby_names.csv')
+    actors_df = pd.read_csv('Baby_Names_Start/AList.csv')
+    return baby_names_df, actors_df
+
+# Get decade from a year, partner. We're rounding down to the nearest decade.
+def get_decade(year):
+    return (year // 10) * 10
+
+# Process data function, amigo. This one's the big kahuna.
+def process_data(baby_names_df, actors_df):
+    # Extract unique first names from the actors list, compadre.
+    actor_first_names = actors_df['Fname'].unique()
+
+    # Split those baby names into individual names and flatten the list, like a prairie.
+    female_names = baby_names_df['Female Names'].str.split(', ').explode().unique()
+    male_names = baby_names_df['Male Names'].str.split(', ').explode().unique()
+
+    # Convert to sets for easier comparison, like keeping tabs on your posse.
+    actor_names_set = set(actor_first_names)
+    female_names_set = set(female_names)
+    male_names_set = set(male_names)
+
+    # Create a list to store the results, buckaroo.
+    results = []
+
+    # Iterate through the actor DataFrame and check if their names appear in the baby names of each year.
+    for index, row in actors_df.iterrows():
+        actor_name = row['Fname']
+        actor_year = row['Year']
+
+        # Check if the actor's name is in the baby names for the corresponding year.
+        for i, baby_row in baby_names_df.iterrows():
+            baby_year = baby_row['Year']
+            baby_decade = get_decade(baby_year)
+            female_names = baby_row['Female Names'].split(', ')
+            male_names = baby_row['Male Names'].split(', ')
+
+            if actor_name in female_names or actor_name in male_names:
+                results.append({
+                    'Actor Name': actor_name,
+                    'Actor Year': get_decade(actor_year),
+                    'Baby Decade': baby_decade,
+                    'Gender': 'Female' if actor_name in female_names else 'Male'
+                })
+
+    # Convert results to a DataFrame, partner.
+    results_df = pd.DataFrame(results)
+
+    # Group by decades and actor names, just like rounding up cattle.
+    grouped_results_df = results_df.groupby(['Baby Decade', 'Actor Name']).size().reset_index(name='Count')
+
+    # Calculate total baby names per decade, tally 'em up.
+    baby_names_df['Baby Decade'] = baby_names_df['Year'].apply(get_decade)
+    total_names_per_decade = baby_names_df.groupby('Baby Decade').size().reset_index(name='Total Names')
+
+    # Merge the grouped results with total names per decade to calculate percentages.
+    merged_df = pd.merge(grouped_results_df, total_names_per_decade, on='Baby Decade')
+    merged_df['Percentage'] = (merged_df['Count'] / merged_df['Total Names']) * 100
+
+    # Ensure Baby Decade is formatted correctly without commas.
+    merged_df['Baby Decade'] = merged_df['Baby Decade'].astype(str)
+
+    return merged_df
+
+# Function to display results, saddle up!
+def display_results(merged_df):
+    # Display the table, like showing the spoils of your gold rush.
+    st.write("### Table of Actor Names Influencing Baby Names by Decade")
+    st.dataframe(merged_df)
+
+    # Create a bar chart, visualize your journey through the data trail.
+    fig = px.bar(merged_df, x='Baby Decade', y='Percentage', color='Actor Name', 
+                 title='Percentage of Baby Names Influenced by Actor Names per Decade')
+    st.plotly_chart(fig)
+
+# Main function, where the action begins.
+def main():
+    st.title('Influence of Actor Names on Baby Names')
+    baby_names_df, actors_df = load_data()
+    merged_df = process_data(baby_names_df, actors_df)
+    display_results(merged_df)
+
+if __name__ == "__main__":
+    main()
