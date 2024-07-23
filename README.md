@@ -10,14 +10,20 @@ Baby names can have a curious origin so can we identify some trends that make pe
 Research questions:
 ## Deliverables
 1. Investigate names that have been given to babies of either sex every year for the 100 years from 1924 through 2024..
+    Using dropdown from 1910-2024 find the names
 2. Traditional names, faddish names.  Popularity according to the number of years that the name appears in the dataset, does it re-appear during certain times?  
-3. Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset.  
+    Actor names, percentage found
+3. Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset. 
+    Bar chart on right pane to rank by state
 4.  Movie/Actor names popular by decade.
-5.  Popular names surrounding world events.
-6.  Biblical names by state, vs. common names, how often do biblical names appear on average?
-7. What is the most popular name in 100 years, how often does it occur?  Yearly trends?
-8. Males and Females with the same name, years and the number of babies given any male/female name in that year.
-9. The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
+    Need chart with Donut
+5.  Biblical names by state, vs. common names, how often do biblical names appear on average?
+    Need Biblical names by state, merge master names list with biblical names display result
+6. What is the most popular name in 100 years, how often does it occur?  Yearly trends?
+    Trend analysis for 100 years?
+7. Males and Females with the same name, years and the number of babies given any male/female name in that year.
+    Jack working on it
+8. The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
 Source:
 https://www.ssa.gov/oact/babynames/
 https://www.imdb.com/list/ls025653489/
