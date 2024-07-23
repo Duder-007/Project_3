@@ -243,3 +243,25 @@ yearly_trends_chart = alt.Chart(df_yearly_trends).mark_line(point=True).encode(
     title=f"Yearly Trends of the Name {selected_top_name}"
 )
 st.altair_chart(yearly_trends_chart, use_container_width=True)
+
+# Display male and female names with the same name
+st.title("Males and Females with the Same Name")
+same_name_df = df_top_baby_names_yr.groupby(['Year', 'Name', 'Gender'])['Count'].sum().reset_index()
+same_name_df = same_name_df.pivot_table(index=['Year', 'Name'], columns='Gender', values='Count').reset_index()
+same_name_df = same_name_df.dropna().sort_values(by='Year')
+st.dataframe(same_name_df)
+
+# Display the total number of babies given any male/female name in the selected year
+selected_name = st.selectbox("Select a name to see yearly counts", name_list)
+name_yearly_counts = df_top_baby_names_yr[df_top_baby_names_yr['Name'] == selected_name]
+yearly_counts_chart = alt.Chart(name_yearly_counts).mark_line(point=True).encode(
+    x='Year:O',
+    y='Count:Q',
+    color='Gender:N',
+    tooltip=['Year', 'Gender', 'Count']
+).properties(
+    width=800,
+    height=400,
+    title=f"Yearly Counts for the Name {selected_name} by Gender"
+)
+st.altair_chart(yearly_counts_chart, use_container_width=True)
