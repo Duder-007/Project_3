@@ -9,22 +9,17 @@ Description:
 Baby names can have a curious origin so can we identify some trends that make people choose the names they do?  Over the past 100 years we will attempt to identify popular names and some trends that influence the outcome.
 Research questions:
 ## Deliverables
-1. Investigate names that have been given to babies of either sex every year for the 100 years from 1924 through 2024..
+1. (Theirno) Investigate names that have been given to babies of either sex every year for the 100 years from 1924 through 2024..
     Using dropdown from 1910-2024 find the names
-2. Traditional names, faddish names.  Popularity according to the number of years that the name appears in the dataset, does it re-appear during certain times?  
+2. (JEN)Traditional names, faddish names.  Popularity according to the number of years that the name appears in the dataset, does it re-appear during certain times?  
     Actor names, percentage found
-3. Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset. 
-    Bar chart on right pane to rank by state
-4.  Movie/Actor names popular by decade.
-    Need chart with Donut
-5.  Biblical names by state, vs. common names, how often do biblical names appear on average?
-    Need Biblical names by state, merge master names list with biblical names display result
-6. What is the most popular name in 100 years, how often does it occur?  Yearly trends?
+3. (Thierno)Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset. 
+4.  (JEN)Movie/Actor names popular by decade.
+5.  (Slyvia)Biblical names by state, vs. common names, how often do biblical names appear on average?
+6. (JACK) What is the most popular name in 100 years, how often does it occur?  Yearly trends?    
+7. (JACK) Males and Females with the same name, years and the number of babies given any male/female name in that year.
+8. (Sylvia)The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
     
-7. Males and Females with the same name, years and the number of babies given any male/female name in that year.
-    Jack working on it
-8. The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
-    Thierno working on it.
 Source:
 https://www.ssa.gov/oact/babynames/
 https://www.imdb.com/list/ls025653489/
