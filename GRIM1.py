@@ -4,88 +4,91 @@ import altair as alt
 import folium
 from streamlit.components.v1 import html
 
-# We’re saddling up for a ride with this Streamlit dashboard, setting up with all the trimmings.
+# Set up the Streamlit dashboard
 st.set_page_config(
-    page_title="US Baby Name Dashboard", # Like putting a name on a ranch gate.
-    page_icon="👶", # Little tyke's the symbol of our focus here.
-    layout="wide", # Spread out wide, like a prairie.
-    initial_sidebar_state="collapsed" # We're starting with the sidebar tucked away.
+    page_title="US Baby Name Dashboard",
+    page_icon="👶",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-
-# This here’s the custom CSS to keep that sidebar behaving, hidden until called.
+# Custom CSS for the sidebar toggle button
 custom_css = """
 <style>
-button[data-testid="stSidebarNav"] { display: none; }  # Hide the usual toggle, like hiding the key to the liquor cabinet.
+button[data-testid="stSidebarNav"] { display: none; }
 
-#toggle-btn {  # This is our own button, like branding our cattle.
-    position: fixed;  # Fixed in place, like a post in dry concrete.
-    top: 16px; left: 16px;  # Just right of the top corner, where it's easy to spot.
-    width: 30px; height: 30px;  # Small but noticeable.
-    background-color: #4CAF50; color: white;  # Green as the grass after a rain, with white like a cowboy's hat.
-    border: none; border-radius: 5px;  # Smooth and rounded, no sharp edges here.
-    cursor: pointer; z-index: 999;  # Stands out on top, like a sheriff at a town meeting.
+#toggle-btn {
+    position: fixed;
+    top: 16px; left: 16px;
+    width: 30px; height: 30px;
+    background-color: #4CAF50; color: white;
+    border: none; border-radius: 5px;
+    cursor: pointer; z-index: 999;
 }
 
 .css-1lcbmhc.e1fqkh3o3 {
-    transition: transform 0.3s ease;  # Smooth as a good whiskey.
-    transform: translateX(-300px);  # Start hidden out of sight.
+    transition: transform 0.3s ease;
+    transform: translateX(-300px);
 }
 
 .css-1lcbmhc.e1fqkh3o3.expanded {
-    transform: translateX(0);  # Slide into view when needed.
+    transform: translateX(0);
 }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
-st.markdown('<button id="toggle-btn">☰</button>', unsafe_allow_html=True)  # The button that brings the sidebar into view.
+st.markdown('<button id="toggle-btn">☰</button>', unsafe_allow_html=True)
 
-# Little script to make that custom button work, like teaching a horse to trot on command.
+# JavaScript for the sidebar toggle button
 st.markdown("""
 <script>
-const toggleButton = document.getElementById('toggle-btn');  # Grab our custom button.
-const sidebar = document.querySelector('.css-1lcbmh3.e1fqkh3o3');  # Find the sidebar.
+const toggleButton = document.getElementById('toggle-btn');
+const sidebar = document.querySelector('.css-1lcbmhc.e1fqkh3o3');
 toggleButton.addEventListener('click', () => {
-    sidebar.classList.toggle('expanded');  # Toggle the view like flipping a coin.
+    sidebar.classList.toggle('expanded');
 });
 </script>
 """, unsafe_allow_html=True)
 
-alt.themes.enable("dark")  # Set a dark theme for our charts, easy on the eyes like a shady porch.
+alt.themes.enable("dark")
 
-# Loading up the data like loading a wagon for a long journey.
-df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
-biblical_names_df = pd.read_csv("Baby_Names_Start/biblical_names.csv")
-df_top_five_names_per_state = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+# Load the data
+@st.cache_data
+def load_data():
+    try:
+        df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+        biblical_names_df = pd.read_csv("Baby_Names_Start/biblical_names.csv")
+        df_top_five_names_per_state = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+        return df_top_baby_names_yr, biblical_names_df, df_top_five_names_per_state
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return None, None, None
 
-# Setting up the sidebar for selections, like choosing the right tool for the job.
+df_top_baby_names_yr, biblical_names_df, df_top_five_names_per_state = load_data()
+
+if df_top_baby_names_yr is None or biblical_names_df is None or df_top_five_names_per_state is None:
+    st.stop()
+
+# Sidebar selections
 with st.sidebar:
-    st.title("US Baby Names Dashboard")  # Marking our territory.
-    year_list = list(df_top_baby_names_yr.Year.unique())  # Get all the years available.
-    selected_year = st.selectbox("Select a year", year_list)  # Choose a year.
-    name_list = df_top_baby_names_yr.Name.unique().tolist()  # All the names rounded up.
-    selected_names = st.multiselect("Select names", name_list)  # Pick the names you're interested in.
+    st.title("US Baby Names Dashboard")
+    year_list = list(df_top_baby_names_yr.Year.unique())
+    selected_year = st.selectbox("Select a year", year_list)
+    name_list = df_top_baby_names_yr.Name.unique().tolist()
+    selected_names = st.multiselect("Select names", name_list)
     color_themes = ["yellowgreen", "blues", "greens", "reds", "purples"]
     selected_color_theme = st.selectbox("Select Color Theme", color_themes, index=color_themes.index("yellowgreen"))
 
-# Filter data based on selections like sorting cattle by brand.
+# Filter data
 df_filtered = df_top_baby_names_yr[df_top_baby_names_yr["Year"] == selected_year]
 if selected_names:
     df_filtered = df_filtered[df_filtered["Name"].isin(selected_names)]
 
-# Calculating the percentage of biblical names, like figuring out how much of your herd is prize-winning.
-# Calculate the percentage of biblical names in the selected year
-df_filtered = df_top_baby_names_yr[df_top_baby_names_yr['Year'] == selected_year]
+# Calculate the percentage of biblical names
 selected_biblical_names = set(df_filtered['Name']).intersection(set(biblical_names_df['Name']))
 percent_biblical = len(selected_biblical_names) / len(set(df_filtered['Name'])) * 100 if df_filtered['Name'].any() else 0
 
-#st.write(f"Percentage of biblical names in the top baby names for {selected_year}: {percent_biblical:.2f}%")
-
-#biblical_names = set(biblical_names_df["Name"].str.upper())
-#selected_biblical_names = set(name.upper() for name in selected_names if name.upper() in biblical_names)
-#percent_biblical = len(selected_biblical_names) / len(selected_names) * 100 if selected_names else 0
-
-# Creating a donut chart, simple as pie.
+# Create a donut chart
 def make_donut_chart(percent, color_theme):
     color_dict = {
         "yellowgreen": ["#4CAF50", "#FFCCCB"],
@@ -107,7 +110,7 @@ def make_donut_chart(percent, color_theme):
 
 donut_chart = make_donut_chart(percent_biblical, selected_color_theme)
 
-# Drawing up the heatmap, like laying out a map for a new territory.
+# Create a heatmap
 def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
     heatmap = alt.Chart(df).mark_rect().encode(
         y=alt.Y(f'{input_y}:O', axis=alt.Axis(title="Year", titleFontSize=18, titlePadding=15, titleFontWeight=900, labelAngle=0)),
@@ -121,15 +124,15 @@ def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
     )
     return heatmap
 
-# Building a choropleth map, marking out the lay of the land.
+# Create a choropleth map
 def make_choropleth(df):
-    df['State'] = df['State'].apply(lambda x: x.upper())  # Standardize the state names.
+    df['State'] = df['State'].apply(lambda x: x.upper())
     
-    us_states_url = 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json'  # Map data, like a good sturdy map.
+    us_states_url = 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json'
     
-    state_data = df.groupby('State')['Count'].sum().reset_index()  # Sum up the counts by state.
+    state_data = df.groupby('State')['Count'].sum().reset_index()
     
-    m = folium.Map(location=[37.8, -96], zoom_start=4)  # Set the starting point of the map.
+    m = folium.Map(location=[37.8, -96], zoom_start=4)
     
     folium.Choropleth(
         geo_data=us_states_url,
@@ -141,49 +144,49 @@ def make_choropleth(df):
         fill_opacity=0.7,
         line_opacity=0.2,
         legend_name='Total Count'
-    ).add_to(m)  # Apply the choropleth overlay.
+    ).add_to(m)
     
-    folium.LayerControl().add_to(m)  # Add control layers to switch views.
+    folium.LayerControl().add_to(m)
     
     return m
 
-# Putting up a title like hanging a sign over a saloon.
+# Display the title
 st.title('Baby Names In the US and Data that defines them')
 
-# Setting up a two-column layout, like having two horses in the stable.
+# Two-column layout
 col1, col2 = st.columns([3, 1])
 
-# In the left column, we're showing all the main attractions.
+# Left column
 with col1:
-    input_y = st.selectbox('Select Y axis', df_filtered.columns, index=df_filtered.columns.get_loc('Year'))  # Choosing what goes on the Y-axis.
-    input_x = st.selectbox('Select X axis', df_filtered.columns, index=df_filtered.columns.get_loc('State'))  # Choosing what goes on the X-axis.
-    input_color = st.selectbox('Select Color axis', df_filtered.columns, index=df_filtered.columns.get_loc('Count'))  # Choosing the data for color coding.
-    input_color_theme = selected_color_theme  # Use the selected color theme.
+    input_y = st.selectbox('Select Y axis', df_filtered.columns, index=df_filtered.columns.get_loc('Year'))
+    input_x = st.selectbox('Select X axis', df_filtered.columns, index=df_filtered.columns.get_loc('State'))
+    input_color = st.selectbox('Select Color axis', df_filtered.columns, index=df_filtered.columns.get_loc('Count'))
+    input_color_theme = selected_color_theme
 
-    # Display the heatmap, bright as a new silver dollar.
+    # Display the heatmap
     heatmap_chart = make_heatmap(df_filtered, input_y, input_x, input_color, input_color_theme)
     st.altair_chart(heatmap_chart, use_container_width=True)
 
-    # Generate and display the choropleth map, showing where the action is.
+    # Generate and display the choropleth map
     choropleth_map = make_choropleth(df_filtered)
-    choropleth_map.save('choropleth_map.html')  # Save the map to a file.
+    choropleth_map.save('choropleth_map.html')
     with open('choropleth_map.html', 'r', encoding='utf-8') as f:
-        html_content = f.read()  # Read the map from the file.
-    html(html_content, height=600)  # Show the map in the dashboard.
+        html_content = f.read()
+    html(html_content, height=600)
 
-    # Show the donut chart, as inviting as a pie cooling on a windowsill.
+    # Display the donut chart
     st.title("Percentage of Selected Biblical Names")
     st.altair_chart(donut_chart, use_container_width=True)
 
-# In the right column, like a sidearm in a holster, we're ready to draw.
+# Right column
 with col2:
-    st.title("Top 5 Names per State")  # Announcing what we're aiming to show.
-    df_top_five_filtered = df_top_five_names_per_state[df_top_five_names_per_state["Year"] == selected_year]  # Filter the data for the selected year.
+    st.title("Top 5 Names per State")
+    df_top_five_filtered = df_top_five_names_per_state[df_top_five_names_per_state["Year"] == selected_year]
     
-    state_list = df_top_five_filtered['State'].unique().tolist()  # Get a list of all states from the filtered data.
-    selected_state = st.selectbox("Select a state", state_list)  # Allow the user to pick a state.
+    state_list = df_top_five_filtered['State'].unique().tolist()
+    selected_state = st.selectbox("Select a state", state_list)
     
-    if selected_state:  # If a state is selected, show the top names.
+    if selected_state:
         top_names = df_top_five_filtered[df_top_five_filtered['State'] == selected_state][['Name', 'Count']]
         names_chart = alt.Chart(top_names).mark_bar().encode(
             x='Name:N',
@@ -191,4 +194,71 @@ with col2:
             color=alt.Color('Count:Q', scale=alt.Scale(scheme=input_color_theme)),
             tooltip=['Name', 'Count']
         ).properties(height=300, width=400)
-        st.altair_chart(names_chart, use_container_width=True)  # Display the bar chart.
+        st.altair_chart(names_chart, use_container_width=True)
+# Load the data
+@st.cache_data
+def load_data():
+    try:
+        df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+        return df_top_baby_names_yr
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return None
+
+df_top_baby_names_yr = load_data()
+
+if df_top_baby_names_yr is None:
+    st.stop()
+
+# Aggregate data over the last 100 years
+import streamlit as st
+import pandas as pd
+import altair as alt
+
+# Load the data
+@st.cache_data
+def load_data():
+    try:
+        df_top_baby_names_yr = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
+        return df_top_baby_names_yr
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return None
+
+df_top_baby_names_yr = load_data()
+
+if df_top_baby_names_yr is None:
+    st.stop()
+
+# Aggregate data over the last 100 years
+df_aggregated = df_top_baby_names_yr.groupby('Name')['Count'].sum().reset_index()
+df_aggregated = df_aggregated.sort_values(by='Count', ascending=False).head(5)
+
+# Get the top 5 names
+top_5_names = df_aggregated['Name'].tolist()
+default_name = top_5_names[0]
+
+# Sidebar for selecting a name
+st.sidebar.title("Top 5 Baby Names")
+selected_name = st.sidebar.selectbox("Select a name", top_5_names, index=0)
+
+# Yearly trends for the selected name
+df_yearly_trends = df_top_baby_names_yr[df_top_baby_names_yr['Name'] == selected_name]
+
+# Display the selected name and its total occurrences
+total_occurrences = df_yearly_trends['Count'].sum()
+st.title(f'Yearly Trends for the Name {selected_name}')
+st.write(f"The name **{selected_name}** has a total of **{total_occurrences}** occurrences over the last 100 years.")
+
+# Plot the yearly trends
+yearly_trends_chart = alt.Chart(df_yearly_trends).mark_line(point=True).encode(
+    x='Year:O',
+    y='Count:Q',
+    tooltip=['Year', 'Count']
+).properties(
+    width=800,
+    height=400,
+    title=f"Yearly Trends of the Name {selected_name}"
+)
+
+st.altair_chart(yearly_trends_chart, use_container_width=True)
