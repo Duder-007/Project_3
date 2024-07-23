@@ -185,3 +185,4 @@ with col2:
             tooltip=['Name', 'Count']
         ).properties(height=300, width=400)
         st.altair_chart(names_chart, use_container_width=True)  # Display the bar chart.
+
