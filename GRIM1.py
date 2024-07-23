@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
+import plotly.express as px
+import plotly.graph_objects as go
 import folium
 from streamlit.components.v1 import html
 
@@ -50,8 +51,6 @@ toggleButton.addEventListener('click', () => {
 </script>
 """, unsafe_allow_html=True)
 
-alt.themes.enable("dark")
-
 # Load the data
 @st.cache_data
 def load_data():
@@ -69,66 +68,6 @@ df_top_baby_names_yr, biblical_names_df, df_top_five_names_per_state, top_baby_n
 
 if df_top_baby_names_yr is None or biblical_names_df is None or df_top_five_names_per_state is None or top_baby_names_100yrs_df is None:
     st.stop()
-
-# Helper function to create a donut chart
-def make_donut_chart(percent, color_theme):
-    color_dict = {
-        "yellowgreen": ["#4CAF50", "#FFCCCB"],
-        "blues": ["#1f77b4", "#aec7e8"],
-        "greens": ["#2ca02c", "#98df8a"],
-        "reds": ["#d62728", "#ff9896"],
-        "purples": ["#9467bd", "#c5b0d5"]
-    }
-    data = pd.DataFrame({
-        'category': ['Biblical Names', 'Other Names'],
-        'value': [percent, 100 - percent]
-    })
-    chart = alt.Chart(data).mark_arc(innerRadius=50).encode(
-        theta=alt.Theta(field="value", type="quantitative"),
-        color=alt.Color(field="category", type="nominal", scale=alt.Scale(range=color_dict[color_theme])),
-        tooltip=["category", "value"]
-    ).properties(width=200, height=200)
-    return chart
-
-# Helper function to create a heatmap
-def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
-    heatmap = alt.Chart(df).mark_rect().encode(
-        y=alt.Y(f'{input_y}:O', axis=alt.Axis(title="Year", titleFontSize=18, titlePadding=15, titleFontWeight=900, labelAngle=0)),
-        x=alt.X(f'{input_x}:O', axis=alt.Axis(title="", titleFontSize=18, titlePadding=15, titleFontWeight=900)),
-        color=alt.Color(f'max({input_color}):Q', legend=None, scale=alt.Scale(scheme=input_color_theme)),
-        stroke=alt.value('black'),
-        strokeWidth=alt.value(0.25),
-    ).properties(width=900).configure_axis(
-        labelFontSize=12,
-        titleFontSize=12
-    )
-    return heatmap
-
-# Helper function to create a choropleth map
-def make_choropleth(df):
-    df['State'] = df['State'].apply(lambda x: x.upper())
-    
-    us_states_url = 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json'
-    
-    state_data = df.groupby('State')['Count'].sum().reset_index()
-    
-    m = folium.Map(location=[37.8, -96], zoom_start=4)
-    
-    folium.Choropleth(
-        geo_data=us_states_url,
-        name='choropleth',
-        data=state_data,
-        columns=['State', 'Count'],
-        key_on='feature.id',
-        fill_color='YlGn',
-        fill_opacity=0.7,
-        line_opacity=0.2,
-        legend_name='Total Count'
-    ).add_to(m)
-    
-    folium.LayerControl().add_to(m)
-    
-    return m
 
 # Setting up the sidebar for selections
 with st.sidebar:
@@ -159,6 +98,50 @@ if selected_names:
 selected_biblical_names = set(df_filtered['Name']).intersection(set(biblical_names_df['Name']))
 percent_biblical = len(selected_biblical_names) / len(set(df_filtered['Name'])) * 100 if df_filtered['Name'].any() else 0
 
+# Helper function to create a donut chart
+def make_donut_chart(percent, color_theme):
+    color_dict = {
+        "yellowgreen": ["#4CAF50", "#FFCCCB"],
+        "blues": ["#1f77b4", "#aec7e8"],
+        "greens": ["#2ca02c", "#98df8a"],
+        "reds": ["#d62728", "#ff9896"],
+        "purples": ["#9467bd", "#c5b0d5"]
+    }
+    fig = go.Figure(data=[go.Pie(labels=['Biblical Names', 'Other Names'], values=[percent, 100 - percent], hole=.4)])
+    fig.update_traces(marker=dict(colors=color_dict[color_theme]))
+    return fig
+
+# Helper function to create a heatmap using Plotly
+def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
+    heatmap = px.density_heatmap(df, x=input_x, y=input_y, z=input_color, color_continuous_scale=input_color_theme)
+    return heatmap
+
+# Helper function to create a choropleth map
+def make_choropleth(df):
+    df['State'] = df['State'].apply(lambda x: x.upper())
+    
+    us_states_url = 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json'
+    
+    state_data = df.groupby('State')['Count'].sum().reset_index()
+    
+    m = folium.Map(location=[37.8, -96], zoom_start=4)
+    
+    folium.Choropleth(
+        geo_data=us_states_url,
+        name='choropleth',
+        data=state_data,
+        columns=['State', 'Count'],
+        key_on='feature.id',
+        fill_color='YlGn',
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name='Total Count'
+    ).add_to(m)
+    
+    folium.LayerControl().add_to(m)
+    
+    return m
+
 # Display the title
 st.title('Baby Names In the US and Data that defines them')
 
@@ -174,7 +157,7 @@ with col1:
 
     # Display the heatmap
     heatmap_chart = make_heatmap(df_filtered, input_y, input_x, input_color, input_color_theme)
-    st.altair_chart(heatmap_chart, use_container_width=True)
+    st.plotly_chart(heatmap_chart, use_container_width=True)
 
     # Generate and display the choropleth map
     choropleth_map = make_choropleth(df_filtered)
@@ -186,7 +169,7 @@ with col1:
     # Display the donut chart
     st.title("Percentage of Selected Biblical Names")
     donut_chart = make_donut_chart(percent_biblical, selected_color_theme)
-    st.altair_chart(donut_chart, use_container_width=True)
+    st.plotly_chart(donut_chart, use_container_width=True)
 
     # Most popular name over the last century
     st.title("Most Popular Name Over Last Century")
@@ -208,13 +191,8 @@ with col2:
     
     if selected_state:
         top_names = df_top_five_filtered[df_top_five_filtered['State'] == selected_state][['Name', 'Count']]
-        names_chart = alt.Chart(top_names).mark_bar().encode(
-            x='Name:N',
-            y='Count:Q',
-            color=alt.Color('Count:Q', scale=alt.Scale(scheme=input_color_theme)),
-            tooltip=['Name', 'Count']
-        ).properties(height=300, width=400)
-        st.altair_chart(names_chart, use_container_width=True)
+        names_chart = px.bar(top_names, x='Name', y='Count', color='Count', color_continuous_scale=input_color_theme)
+        st.plotly_chart(names_chart, use_container_width=True)
 
     # Top baby names by state
     top_names_states = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
@@ -234,16 +212,8 @@ df_yearly_trends = df_top_baby_names_yr[df_top_baby_names_yr['Name'] == selected
 total_occurrences = df_yearly_trends['Count'].sum()
 st.title(f'Yearly Trends for the Name {selected_top_name}')
 st.write(f"The name **{selected_top_name}** has a total of **{total_occurrences}** occurrences over the last 100 years.")
-yearly_trends_chart = alt.Chart(df_yearly_trends).mark_line(point=True).encode(
-    x='Year:O',
-    y='Count:Q',
-    tooltip=['Year', 'Count']
-).properties(
-    width=800,
-    height=400,
-    title=f"Yearly Trends of the Name {selected_top_name}"
-)
-st.altair_chart(yearly_trends_chart, use_container_width=True)
+yearly_trends_chart = px.line(df_yearly_trends, x='Year', y='Count', color='Gender', title=f"Yearly Trends of the Name {selected_top_name}")
+st.plotly_chart(yearly_trends_chart, use_container_width=True)
 
 # Display male and female names with the same name
 st.title("Males and Females with the Same Name")
@@ -255,14 +225,5 @@ st.dataframe(same_name_df)
 # Display the total number of babies given any male/female name in the selected year
 selected_name = st.selectbox("Select a name to see yearly counts", filtered_names)
 name_yearly_counts = df_top_baby_names_yr[df_top_baby_names_yr['Name'] == selected_name]
-yearly_counts_chart = alt.Chart(name_yearly_counts).mark_line(point=True).encode(
-    x='Year:O',
-    y='Count:Q',
-    color='Gender:N',
-    tooltip=['Year', 'Gender', 'Count']
-).properties(
-    width=800,
-    height=400,
-    title=f"Yearly Counts for the Name {selected_name} by Gender"
-)
-st.altair_chart(yearly_counts_chart, use_container_width=True)
+yearly_counts_chart = px.line(name_yearly_counts, x='Year', y='Count', color='Gender', title=f"Yearly Counts for the Name {selected_name} by Gender")
+st.plotly_chart(yearly_counts_chart, use_container_width=True)
