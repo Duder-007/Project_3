@@ -82,11 +82,20 @@ with st.sidebar:
     st.title("US Baby Names Dashboard")
     year_list = list(df_top_baby_names_yr.Year.unique())
     selected_year = st.selectbox("Select a year", year_list)
-    name_list = df_top_baby_names_yr.Name.unique().tolist()
-    selected_names = st.multiselect("Select names", name_list)
+
+    # Filter names based on selected year
+    filtered_names = df_top_baby_names_yr[df_top_baby_names_yr['Year'] == selected_year]['Name'].unique().tolist()
+
+    selected_names = st.multiselect("Select names", filtered_names)
     color_themes = ["yellowgreen", "blues", "greens", "reds", "purples"]
     selected_color_theme = st.selectbox("Select Color Theme", color_themes, index=color_themes.index("yellowgreen"))
-    selected_top_name = st.selectbox("Select a top name to view trends", top_5_names, index=0)
+
+    # Top names from filtered list
+    filtered_df_aggregated = df_top_baby_names_yr[df_top_baby_names_yr['Year'] == selected_year].groupby('Name')['Count'].sum().reset_index()
+    filtered_df_aggregated = filtered_df_aggregated.sort_values(by='Count', ascending=False).head(5)
+    top_5_filtered_names = filtered_df_aggregated['Name'].tolist()
+
+    selected_top_name = st.selectbox("Select a top name to view trends", top_5_filtered_names, index=0)
 
 # Filter data based on selections
 df_filtered = df_top_baby_names_yr[df_top_baby_names_yr["Year"] == selected_year]
@@ -252,7 +261,7 @@ same_name_df = same_name_df.dropna().sort_values(by='Year')
 st.dataframe(same_name_df)
 
 # Display the total number of babies given any male/female name in the selected year
-selected_name = st.selectbox("Select a name to see yearly counts", name_list)
+selected_name = st.selectbox("Select a name to see yearly counts", filtered_names)
 name_yearly_counts = df_top_baby_names_yr[df_top_baby_names_yr['Name'] == selected_name]
 yearly_counts_chart = alt.Chart(name_yearly_counts).mark_line(point=True).encode(
     x='Year:O',
