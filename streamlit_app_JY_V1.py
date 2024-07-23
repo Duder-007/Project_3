@@ -233,3 +233,59 @@ with col2:
     filtered_df = top_names_state_df[top_names_state_df["State"] == state_filter]
     st.write(f"Top baby names in {state_filter}:")
     st.dataframe(filtered_df)
+
+# # Load the dataset
+
+# df_unisex_names = pd.read_csv('Baby_Names_Start/2top_baby_names.csv')
+# # Split the names and stack them into a single column
+# df_unisex_names["Female Names"] = df_unisex_names["Female Names"].str.split(', ')
+# df_unisex_names["Male Names"] = df_unisex_names["Male Names"].str.split(', ')
+# female_df = df_unisex_names["Female Names"].apply(pd.Series).stack().reset_index(level=1, drop=True).to_frame("Names")
+# male_df = df_unisex_names["Male Names"].apply(pd.Series).stack().reset_index(level=1, drop=True).to_frame("Names")
+# female_df["Gender"] = "F"
+# male_df['Gender'] = "M"
+
+# # Concatenate the dataframes
+# df = pd.concat([female_df, male_df], axis=0).reset_index()
+
+# # Find names that are both male and female
+# def find_unisex_names(df_unisex_names):
+#     male_names = df_unisex_names[df['Gender'] == 'M']['Names'].unique()
+#     female_names = df_unisex_names[df['Gender'] == 'F']['Names'].unique()
+#     unisex_names = list(set(male_names) & set(female_names))
+#     return unisex_names
+
+# unisex_names = find_unisex_names(df)
+
+# # Display the result
+# st.write('Unisex Names:', unisex_names)
+
+# Unisex names
+
+df = pd.read_csv("Baby_Names_Start/usa_baby_names.csv")
+
+# Find names that are both male and female
+def find_unisex_names(df):
+    male_names = df[df["sex"] == "M"]["first_name"].unique()
+    female_names = df[df["sex"] == "F"]["first_name"].unique()
+    unisex_names = list(set(male_names) & set(female_names))
+    return unisex_names
+
+unisex_names = find_unisex_names(df)
+
+def find_years_for_unisex_names(df, unisex_names):
+    years_for_unisex_names = {}
+    for name in unisex_names:
+        years = df[df["first_name"] == name]["year"].unique()
+        years_for_unisex_names[name] = ', '.join(map(str, years))
+    return years_for_unisex_names
+
+years_for_unisex_names = find_years_for_unisex_names(df, unisex_names)
+
+# Display the result
+# st.write('Unisex Names and the Years They Appeared:', years_for_unisex_names)
+
+markdown_text = '## Unisex Names and the Years They Appeared:\n'
+for name, years in years_for_unisex_names.items():
+    markdown_text += f'- **{name}**: {years}\n'
+st.markdown(markdown_text)
