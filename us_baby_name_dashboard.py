@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -66,6 +65,8 @@ with st.sidebar:
     selected_year = st.selectbox("Select a year", year_list)  # Choose a year.
     name_list = df_top_baby_names_yr.Name.unique().tolist()  # All the names rounded up.
     selected_names = st.multiselect("Select names", name_list)  # Pick the names you're interested in.
+    color_themes = ["yellowgreen", "blues", "greens", "reds", "purples"]
+    selected_color_theme = st.selectbox("Select Color Theme", color_themes, index=color_themes.index("yellowgreen"))
 
 # Filter data based on selections like sorting cattle by brand.
 df_filtered = df_top_baby_names_yr[df_top_baby_names_yr["Year"] == selected_year]
@@ -78,28 +79,27 @@ df_filtered = df_top_baby_names_yr[df_top_baby_names_yr['Year'] == selected_year
 selected_biblical_names = set(df_filtered['Name']).intersection(set(biblical_names_df['Name']))
 percent_biblical = len(selected_biblical_names) / len(set(df_filtered['Name'])) * 100 if df_filtered['Name'].any() else 0
 
-#st.write(f"Percentage of biblical names in the top baby names for {selected_year}: {percent_biblical:.2f}%")
-
-
-
-#biblical_names = set(biblical_names_df["Name"].str.upper())
-#selected_biblical_names = set(name.upper() for name in selected_names if name.upper() in biblical_names)
-#percent_biblical = len(selected_biblical_names) / len(selected_names) * 100 if selected_names else 0
-
 # Creating a donut chart, simple as pie.
-def make_donut_chart(percent):
+def make_donut_chart(percent, color_theme):
+    color_dict = {
+        "yellowgreen": ["#4CAF50", "#FFCCCB"],
+        "blues": ["#1f77b4", "#aec7e8"],
+        "greens": ["#2ca02c", "#98df8a"],
+        "reds": ["#d62728", "#ff9896"],
+        "purples": ["#9467bd", "#c5b0d5"]
+    }
     data = pd.DataFrame({
         'category': ['Biblical Names', 'Other Names'],
         'value': [percent, 100 - percent]
     })
     chart = alt.Chart(data).mark_arc(innerRadius=50).encode(
         theta=alt.Theta(field="value", type="quantitative"),
-        color=alt.Color(field="category", type="nominal", scale=alt.Scale(range=["#4CAF50", "#FFCCCB"])),
+        color=alt.Color(field="category", type="nominal", scale=alt.Scale(range=color_dict[color_theme])),
         tooltip=["category", "value"]
     ).properties(width=200, height=200)
     return chart
 
-donut_chart = make_donut_chart(percent_biblical)
+donut_chart = make_donut_chart(percent_biblical, selected_color_theme)
 
 # Drawing up the heatmap, like laying out a map for a new territory.
 def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
@@ -152,7 +152,7 @@ with col1:
     input_y = st.selectbox('Select Y axis', df_filtered.columns, index=df_filtered.columns.get_loc('Year'))  # Choosing what goes on the Y-axis.
     input_x = st.selectbox('Select X axis', df_filtered.columns, index=df_filtered.columns.get_loc('State'))  # Choosing what goes on the X-axis.
     input_color = st.selectbox('Select Color axis', df_filtered.columns, index=df_filtered.columns.get_loc('Count'))  # Choosing the data for color coding.
-    input_color_theme = st.selectbox('Color Theme', ["yellowgreen"])  # setting a color scheme to match.
+    input_color_theme = selected_color_theme  # Use the selected color theme.
 
     # Display the heatmap, bright as a new silver dollar.
     heatmap_chart = make_heatmap(df_filtered, input_y, input_x, input_color, input_color_theme)
@@ -182,54 +182,7 @@ with col2:
         names_chart = alt.Chart(top_names).mark_bar().encode(
             x='Name:N',
             y='Count:Q',
-            color=alt.Color('Count:Q', scale=alt.Scale(scheme='yellowgreen')),
+            color=alt.Color('Count:Q', scale=alt.Scale(scheme=input_color_theme)),
             tooltip=['Name', 'Count']
         ).properties(height=300, width=400)
         st.altair_chart(names_chart, use_container_width=True)  # Display the bar chart.
-
-        import pandas as pd
-
-# deliverable 7
-
-# creating output underneath for most popular names over the last century
-
-# writing in a title
-st.title("Most Popular Name Over Last Century")
-
-# reading csv file
-top_baby_names_100yrs_df = pd.read_csv("Baby_Names_Start/2top_baby_names.csv")
-
-# finding the most popular names over the df
-most_popular_male_name = top_baby_names_100yrs_df["Male Names"].value_counts().idxmax()
-most_popular_female_name = top_baby_names_100yrs_df["Female Names"].value_counts().idxmax()
-
-# formatting for output
-st.markdown(f"## Male Name")
-st.markdown(f"### {most_popular_male_name}")
-st.write("")
-st.write("")
-st.write("")
-st.markdown(f"## Female Name")
-st.markdown(f"### {most_popular_female_name}")
-
-# deliverable 9
-
-with col2:
-    # Top Baby Names by States
-    top_names_states = pd.read_csv("Baby_Names_Start/top_five_names_per_state.csv")
-    # Group by State, Gender, and Name and sum the Counts
-    top_names_state_df = top_names_states.groupby(["State", "Gender", "Name"])["Count"].sum().reset_index()
-    # Grab the top 5 (each gender) from each state
-    top_names_state_df = top_names_state_df.sort_values("Count", ascending=False).groupby(["State", "Gender"]).head(5)
-    # Sorting by state name
-    top_names_state_df = top_names_state_df.sort_values("State")
-    # Streamlit Title
-    st.title("Top Baby Names by State")
-    # Display the DataFrame
-    st.write("Top baby names (top 5 for each gender) in each state:")
-    st.dataframe(top_names_state_df)
-    # Select a state to filter the data
-    state_filter = st.selectbox("Select a state to filter:", top_names_state_df["State"].unique())
-    filtered_df = top_names_state_df[top_names_state_df["State"] == state_filter]
-    st.write(f"Top baby names in {state_filter}:")
-    st.dataframe(filtered_df)
