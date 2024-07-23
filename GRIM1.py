@@ -70,12 +70,65 @@ df_top_baby_names_yr, biblical_names_df, df_top_five_names_per_state, top_baby_n
 if df_top_baby_names_yr is None or biblical_names_df is None or df_top_five_names_per_state is None or top_baby_names_100yrs_df is None:
     st.stop()
 
-# Aggregate data over the last 100 years
-df_aggregated = df_top_baby_names_yr.groupby('Name')['Count'].sum().reset_index()
-df_aggregated = df_aggregated.sort_values(by='Count', ascending=False).head(5)
+# Helper function to create a donut chart
+def make_donut_chart(percent, color_theme):
+    color_dict = {
+        "yellowgreen": ["#4CAF50", "#FFCCCB"],
+        "blues": ["#1f77b4", "#aec7e8"],
+        "greens": ["#2ca02c", "#98df8a"],
+        "reds": ["#d62728", "#ff9896"],
+        "purples": ["#9467bd", "#c5b0d5"]
+    }
+    data = pd.DataFrame({
+        'category': ['Biblical Names', 'Other Names'],
+        'value': [percent, 100 - percent]
+    })
+    chart = alt.Chart(data).mark_arc(innerRadius=50).encode(
+        theta=alt.Theta(field="value", type="quantitative"),
+        color=alt.Color(field="category", type="nominal", scale=alt.Scale(range=color_dict[color_theme])),
+        tooltip=["category", "value"]
+    ).properties(width=200, height=200)
+    return chart
 
-# Get the top 5 names
-top_5_names = df_aggregated['Name'].tolist()
+# Helper function to create a heatmap
+def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
+    heatmap = alt.Chart(df).mark_rect().encode(
+        y=alt.Y(f'{input_y}:O', axis=alt.Axis(title="Year", titleFontSize=18, titlePadding=15, titleFontWeight=900, labelAngle=0)),
+        x=alt.X(f'{input_x}:O', axis=alt.Axis(title="", titleFontSize=18, titlePadding=15, titleFontWeight=900)),
+        color=alt.Color(f'max({input_color}):Q', legend=None, scale=alt.Scale(scheme=input_color_theme)),
+        stroke=alt.value('black'),
+        strokeWidth=alt.value(0.25),
+    ).properties(width=900).configure_axis(
+        labelFontSize=12,
+        titleFontSize=12
+    )
+    return heatmap
+
+# Helper function to create a choropleth map
+def make_choropleth(df):
+    df['State'] = df['State'].apply(lambda x: x.upper())
+    
+    us_states_url = 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json'
+    
+    state_data = df.groupby('State')['Count'].sum().reset_index()
+    
+    m = folium.Map(location=[37.8, -96], zoom_start=4)
+    
+    folium.Choropleth(
+        geo_data=us_states_url,
+        name='choropleth',
+        data=state_data,
+        columns=['State', 'Count'],
+        key_on='feature.id',
+        fill_color='YlGn',
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name='Total Count'
+    ).add_to(m)
+    
+    folium.LayerControl().add_to(m)
+    
+    return m
 
 # Setting up the sidebar for selections
 with st.sidebar:
@@ -106,68 +159,6 @@ if selected_names:
 selected_biblical_names = set(df_filtered['Name']).intersection(set(biblical_names_df['Name']))
 percent_biblical = len(selected_biblical_names) / len(set(df_filtered['Name'])) * 100 if df_filtered['Name'].any() else 0
 
-# Create a donut chart
-def make_donut_chart(percent, color_theme):
-    color_dict = {
-        "yellowgreen": ["#4CAF50", "#FFCCCB"],
-        "blues": ["#1f77b4", "#aec7e8"],
-        "greens": ["#2ca02c", "#98df8a"],
-        "reds": ["#d62728", "#ff9896"],
-        "purples": ["#9467bd", "#c5b0d5"]
-    }
-    data = pd.DataFrame({
-        'category': ['Biblical Names', 'Other Names'],
-        'value': [percent, 100 - percent]
-    })
-    chart = alt.Chart(data).mark_arc(innerRadius=50).encode(
-        theta=alt.Theta(field="value", type="quantitative"),
-        color=alt.Color(field="category", type="nominal", scale=alt.Scale(range=color_dict[color_theme])),
-        tooltip=["category", "value"]
-    ).properties(width=200, height=200)
-    return chart
-
-donut_chart = make_donut_chart(percent_biblical, selected_color_theme)
-
-# Create a heatmap
-def make_heatmap(df, input_y, input_x, input_color, input_color_theme):
-    heatmap = alt.Chart(df).mark_rect().encode(
-        y=alt.Y(f'{input_y}:O', axis=alt.Axis(title="Year", titleFontSize=18, titlePadding=15, titleFontWeight=900, labelAngle=0)),
-        x=alt.X(f'{input_x}:O', axis=alt.Axis(title="", titleFontSize=18, titlePadding=15, titleFontWeight=900)),
-        color=alt.Color(f'max({input_color}):Q', legend=None, scale=alt.Scale(scheme=input_color_theme)),
-        stroke=alt.value('black'),
-        strokeWidth=alt.value(0.25),
-    ).properties(width=900).configure_axis(
-        labelFontSize=12,
-        titleFontSize=12
-    )
-    return heatmap
-
-# Create a choropleth map
-def make_choropleth(df):
-    df['State'] = df['State'].apply(lambda x: x.upper())
-    
-    us_states_url = 'https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/us-states.json'
-    
-    state_data = df.groupby('State')['Count'].sum().reset_index()
-    
-    m = folium.Map(location=[37.8, -96], zoom_start=4)
-    
-    folium.Choropleth(
-        geo_data=us_states_url,
-        name='choropleth',
-        data=state_data,
-        columns=['State', 'Count'],
-        key_on='feature.id',
-        fill_color='YlGn',
-        fill_opacity=0.7,
-        line_opacity=0.2,
-        legend_name='Total Count'
-    ).add_to(m)
-    
-    folium.LayerControl().add_to(m)
-    
-    return m
-
 # Display the title
 st.title('Baby Names In the US and Data that defines them')
 
@@ -194,6 +185,7 @@ with col1:
 
     # Display the donut chart
     st.title("Percentage of Selected Biblical Names")
+    donut_chart = make_donut_chart(percent_biblical, selected_color_theme)
     st.altair_chart(donut_chart, use_container_width=True)
 
     # Most popular name over the last century
