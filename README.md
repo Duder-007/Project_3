@@ -20,7 +20,7 @@ Research questions:
 5.  Biblical names by state, vs. common names, how often do biblical names appear on average?
     Need Biblical names by state, merge master names list with biblical names display result
 6. What is the most popular name in 100 years, how often does it occur?  Yearly trends?
-    Trend analysis for 100 years?
+    
 7. Males and Females with the same name, years and the number of babies given any male/female name in that year.
     Jack working on it
 8. The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
