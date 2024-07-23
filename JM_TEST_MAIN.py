@@ -186,3 +186,26 @@ with col2:
         ).properties(height=300, width=400)
         st.altair_chart(names_chart, use_container_width=True)  # Display the bar chart.
 
+# deliverable 7
+
+# creating output underneath in column 2 for most popular names over the last century
+with col2:
+
+    # writing in a title
+    st.title("Most Popular Name Over Last Century")
+
+    # reading csv file
+    top_baby_names_100yrs_df = pd.read_csv("Baby_Names_Start/2top_baby_names.csv")
+
+    # finding the most popular names over the df
+    most_popular_male_name = top_baby_names_100yrs_df["Male Names"].value_counts().idxmax()
+    most_popular_female_name = top_baby_names_100yrs_df["Female Names"].value_counts().idxmax()
+
+    # formatting for output
+    st.markdown(f"## Male Name")
+    st.markdown(f"### {most_popular_male_name}")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.markdown(f"## Female Name")
+    st.markdown(f"### {most_popular_female_name}")
