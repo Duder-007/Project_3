@@ -9,16 +9,16 @@ Description:
 Baby names can have a curious origin so can we identify some trends that make people choose the names they do?  Over the past 100 years we will attempt to identify popular names and some trends that influence the outcome.
 Research questions:
 ## Deliverables
-1. (Theirno) Investigate names that have been given to babies of either sex every year for the 100 years from 1924 through 2024..
+1. Investigate names that have been given to babies of either sex every year for the 100 years from 1924 through 2024..
     Using dropdown from 1910-2024 find the names
-2. (JEN)Traditional names, faddish names.  Popularity according to the number of years that the name appears in the dataset, does it re-appear during certain times?  
+2. Traditional names, faddish names.  Popularity according to the number of years that the name appears in the dataset, does it re-appear during certain times?  
     Actor names, percentage found
-3. (Thierno)Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset. 
-4.  (JEN)Movie/Actor names popular by decade.
-5.  (Slyvia)Biblical names by state, vs. common names, how often do biblical names appear on average?
-6. (JACK) What is the most popular name in 100 years, how often does it occur?  Yearly trends?    
-7. (JACK) Males and Females with the same name, years and the number of babies given any male/female name in that year.
-8. (Sylvia)The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
+3. Top-ranked female/male names since 1924:  Highest-ranked American female names in our dataset. 
+4. Movie/Actor names popular by decade.
+5. Biblical names by state, vs. common names, how often do biblical names appear on average?
+6. What is the most popular name in 100 years, how often does it occur?  Yearly trends?    
+7. Males and Females with the same name, years and the number of babies given any male/female name in that year.
+8. The most years at number one, list of first names that have been the top male/female first name in any year along with a count of the number of years that name has been the top name.
     
 Source:
 https://www.ssa.gov/oact/babynames/
@@ -69,8 +69,8 @@ Sylvia Turner; sturner6207@gmail.com
 Jennifer McNew; jen.lee.mcnew@gmail.com
 Jack Yeager; jackyeager45@gmail.com
 
-Application and ETL Workflow Analysis
-Application Overview
+#Application and ETL Workflow Analysis
+#Application Overview
 The "US Baby Name Dashboard" is a Streamlit-based application designed to visualize baby names data from multiple perspectives. The dashboard leverages various data visualization libraries like Altair, Plotly, and Folium to create interactive and informative charts and maps. The primary features of the dashboard include:
 1.	Yearly Trends Analysis: Allows users to see the trends of baby names over selected years.
 2.	Top Names Visualization: Provides insights into the most popular names by state and overall trends for the past century.
