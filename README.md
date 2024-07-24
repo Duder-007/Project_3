@@ -69,8 +69,8 @@ Sylvia Turner; sturner6207@gmail.com
 Jennifer McNew; jen.lee.mcnew@gmail.com
 Jack Yeager; jackyeager45@gmail.com
 
-#Application and ETL Workflow Analysis
-#Application Overview
+# Application and ETL Workflow Analysis
+# Application Overview
 The "US Baby Name Dashboard" is a Streamlit-based application designed to visualize baby names data from multiple perspectives. The dashboard leverages various data visualization libraries like Altair, Plotly, and Folium to create interactive and informative charts and maps. The primary features of the dashboard include:
 1.	Yearly Trends Analysis: Allows users to see the trends of baby names over selected years.
 2.	Top Names Visualization: Provides insights into the most popular names by state and overall trends for the past century.
